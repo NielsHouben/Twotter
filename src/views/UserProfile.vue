@@ -3,21 +3,21 @@
   <div class="user-profile">
     <div class="user-profile__sidebar">
       <div class="user-profile__user-panel">
-        <h1 class="user-profile__username">@{{ user.username }}</h1>
-        <div class="user-profile__admin-badge" v-if="user.isAdmin">
+        <h1 class="user-profile__username">@{{ state.user.username }}</h1>
+        <div class="user-profile__admin-badge" v-if="state.user.isAdmin">
           Admin
         </div>
         <div class="user-profile__follower-count">
-          <strong>Followers: </strong> {{ followers }}
+          <strong>Followers: </strong> {{ state.followers }}
         </div>
       </div>
-      <CreateTwootPanel @add-twoot="addTwoot"/>
+      <CreateTwootPanel @add-twoot="state.addTwoot"/>
     </div>
     <div class="user-profile__twoots-wrapper">
       <TwootItem
-          v-for="twoot in user.twoots"
+          v-for="twoot in state.user.twoots"
           :key="twoot.id"
-          :username="user.username"
+          :username="state.user.username"
           :twoot="twoot"
       />
     </div>
@@ -25,33 +25,31 @@
 </template>
 
 <script>
-import TwootItem from "./twootItem";
-import CreateTwootPanel from "./createTwootPanel";
+import { reactive, computed } from "vue"
+import { useRoute } from "vue-router"
+import {users} from "../assets/users"
+import TwootItem from "../components/twootItem";
+import CreateTwootPanel from "../components/createTwootPanel";
 
 export default {
   thisIsTrue: true,
   name: 'UserProfile',
   components: { CreateTwootPanel, TwootItem },
-  data() {
-    return {
+  setup() {
+    const route = useRoute();
+    const userId = computed(() => route.params.userId)
+
+    const state = reactive({
       followers: 0,
-      user: {
-        id: 1,
-        username: '_NielsHouben',
-        firstName: 'Niels',
-        lastName: 'Houben',
-        email: 'niels.houben1@gmail.com',
-        isAdmin: true,
-        twoots: [
-          { id: 1, content: 'Twotter is Amazing!' },
-          { id: 2, content: 'went for a run' },
-        ],
-      },
-    };
-  },
-  methods: {
-    addTwoot(twoot) {
+      user: users[userId.value - 1] || users[0],
+    })
+    function addTwoot(twoot) {
       this.user.twoots.unshift( {id: this.user.twoots.length + 1, content: twoot} );
+    }
+    return { 
+      state,
+      addTwoot,
+      userId,
     }
   },
 };
