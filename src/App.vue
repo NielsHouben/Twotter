@@ -1,9 +1,11 @@
 <template>
   <div id="app">
     <nav>
+      <router-link to="/">
       <div class="navigation__log">
         Twotter
       </div>
+      </router-link>
       <div class="navigation__user">
         {{state.user.username}}
       </div>
